@@ -1,0 +1,2 @@
+rem Please run this script from the root path. ".\tools\create_executable.bat"
+pyinstaller --noconfirm --onefile --console --name "pySupersetCli" --add-data "./pyproject.toml;."  "./src/pySupersetCli/__main__.py"

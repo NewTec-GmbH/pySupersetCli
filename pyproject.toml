@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm", "wheel", "toml"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pySupersetCli"
+version = "1.0.0"
+description = "CLI tool for easy usage of the Superset API."
+readme = "README.md"
+requires-python = ">=3.9"
+authors = [
+    { name = "Gabryel Reyes", email = "gabryel.reyes@newtec.de" },
+    { name = "Juliane Kerpe", email = "juliane.kerpe@newtec.de" }
+]
+license = {text = "BSD 3-Clause"}
+classifiers = [
+    "License :: OSI Approved :: BSD 3-Clause",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11"
+]
+
+dependencies = [
+    "toml>=0.10.2",
+    "requests>=2.32.3"
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest > 5.0.0",
+  "pytest-cov[all]"
+]
+
+[project.urls]
+documentation = "https://github.com/NewTec-GmbH/pySupersetCli"
+repository = "https://github.com/NewTec-GmbH/pySupersetCli"
+tracker = "https://github.com/NewTec-GmbH/pySupersetCli/issues"
+
+[project.scripts]
+pySupersetCli = "pySupersetCli.__main__:main"
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "src"
+]
