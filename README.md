@@ -8,7 +8,6 @@ CLI tool for easy usage of the Superset API.
 * [Overview](#overview)
 * [Usage](#usage)
 * [Commands](#commands)
-  * [Search](#search)
 * [Examples](#examples)
 * [Used Libraries](#used-libraries)
 * [Issues, Ideas And Bugs](#issues-ideas-and-bugs)
