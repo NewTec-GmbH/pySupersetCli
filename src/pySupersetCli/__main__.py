@@ -39,6 +39,7 @@ import logging
 
 from pySupersetCli.version import __version__, __author__, __email__, __repository__, __license__
 from pySupersetCli.ret import Ret
+from pySupersetCli.superset import Superset
 
 
 ################################################################################
@@ -115,6 +116,14 @@ def add_parser() -> argparse.ArgumentParser:
                         help="Print full command details before executing the command.\
                             Enables logs of type INFO and WARNING.")
 
+    parser.add_argument("--no_ssl",
+                        action="store_true",
+                        help="Disables SSL certificate verification.")
+
+    parser.add_argument("--basic_auth",
+                        action="store_true",
+                        help="Use basic authentication instead of LDAP.")
+
     return parser
 
 
@@ -151,7 +160,25 @@ def main() -> Ret:
             for arg in vars(args):
                 LOG.info("* %s = %s", arg, vars(args)[arg])
 
-        if Ret.OK == ret_status:
+        # Create Superset client.
+        try:
+            verify_ssl = not args.no_ssl
+            provider = Superset.Provider.LDAP
+
+            if args.basic_auth:
+                provider = Superset.Provider.DB
+
+            # pylint: disable=unused-variable
+            client = Superset(args.server,
+                              args.user,
+                              args.password,
+                              provider,
+                              verify_ssl=verify_ssl)
+
+        except RuntimeError as e:
+            LOG.error("Failed to create Superset client: %s", e)
+            ret_status = Ret.ERROR_LOGIN
+        else:
             handler = None
 
             # Find the command handler.
@@ -162,7 +189,7 @@ def main() -> Ret:
 
             # Execute the command.
             if handler is not None:
-                ret_status = Ret.OK
+                ret_status = handler(args, client)
             else:
                 LOG.error("Command '%s' not found!", args.cmd)
                 ret_status = Ret.ERROR_INVALID_ARGUMENTS
