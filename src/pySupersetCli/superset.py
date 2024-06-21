@@ -122,7 +122,7 @@ class Superset:  # pylint: disable=too-few-public-methods
                                           login_endpoint,
                                           json=login_body)
 
-        if requests.codes.ok != ret_code:
+        if requests.codes.ok != ret_code:  # pylint: disable=no-member
             LOG.fatal("Login failed: %s", response.get("message"))
             raise RuntimeError("Login failed")
 
@@ -131,7 +131,7 @@ class Superset:  # pylint: disable=too-few-public-methods
         # Get the CSRF token
         ret_code, response = self.request("GET", crsf_token_endpoint)
 
-        if requests.codes.ok != ret_code:
+        if requests.codes.ok != ret_code:  # pylint: disable=no-member
             LOG.fatal("Get CSRF token failed: %s", response.get("message"))
             raise RuntimeError("Get CSRF token failed")
 
@@ -190,8 +190,8 @@ class Superset:  # pylint: disable=too-few-public-methods
 
         else:
             # Check if the token has expired
-            if (reponse_data.get('message') == "Token has expired") and \
-                    (requests.codes.unauthorized == response_code):
+            if (requests.codes.unauthorized == response_code) and \
+                    (reponse_data.get('message') == "Token has expired"):  # pylint: disable=no-member
                 LOG.error("Refreshing token is not implemented.")
             else:
                 response_code = response.status_code
