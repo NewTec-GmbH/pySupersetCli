@@ -104,7 +104,7 @@ def register(subparser) -> dict:
 
 
 def _execute(args, superset_client: Superset) -> Ret:
-    """ This function servers as entry point for the command.
+    """ This function serves as entry point for the command.
         It will be stored as callback for this module's subparser command.
 
     Args: 
