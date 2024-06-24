@@ -85,6 +85,7 @@ class Superset:  # pylint: disable=too-few-public-methods
         self._server_url: str = f"{server_url}/api/v1"
         self._access_token: str = ""
         self._csrf_token: str = ""
+        self._cookies: dict = {}
         self._timeout: int = 60
         self._verify_ssl: bool = verify_ssl
 
@@ -156,7 +157,7 @@ class Superset:  # pylint: disable=too-few-public-methods
                     Can be any accepted by the Requests module.
 
         Returns:
-            dict: The response of the request.
+            tuple[int, dict]: The response code and the response data.
         """
 
         url: str = f"{self._server_url}{endpoint}"
@@ -180,25 +181,38 @@ class Superset:  # pylint: disable=too-few-public-methods
                 headers=headers,
                 timeout=self._timeout,
                 verify=self._verify_ssl,
+                cookies=self._cookies,
+                allow_redirects=False,
                 ** request_kwargs)
-        except requests.exceptions.SSLError as e:
-            LOG.error("SSL error: %s", e)
 
-            if self._verify_ssl is True:
-                LOG.error("If you trust the server you are connecting to (%s), " +
-                          "consider deactivating SSL verification.", self._server_url)
+            response_code = response.status_code
+            reponse_data = response.json()
 
-        else:
+            if response.cookies:
+                self._cookies = response.cookies.get_dict()
+
+            LOG.info("Request: %s %s", method, url)
+            LOG.info("Response Code: %s", response_code)
+
             # Check if the token has expired
             if (requests.codes.unauthorized == response_code) and \
                     (reponse_data.get('message') == "Token has expired"):  # pylint: disable=no-member
                 LOG.error("Refreshing token is not implemented.")
-            else:
-                response_code = response.status_code
-                reponse_data = response.json()
 
-                LOG.info("Request: %s %s", method, url)
-                LOG.info("Response Code: %s", response_code)
+        except requests.exceptions.JSONDecodeError as e:
+            LOG.error("JSON decode error: %s", e)
+
+        except requests.exceptions.Timeout as e:
+            LOG.error("Timeout error: %s", e)
+
+        except requests.exceptions.SSLError as e:
+            LOG.error("SSL error: %s", e)
+            if self._verify_ssl is True:
+                LOG.error("If you trust the server you are connecting to (%s), " +
+                          "consider deactivating SSL verification.", self._server_url)
+
+        except requests.exceptions.RequestException as e:
+            LOG.error("Request error: %s", e)
 
         return (response_code, reponse_data)
 

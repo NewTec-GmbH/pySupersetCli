@@ -49,6 +49,7 @@ class Ret(IntEnum):
     ERROR_LOGIN = 1
     ERROR_ARGPARSE = 2  # Must be 2 to match the argparse error code.
     ERROR_INVALID_ARGUMENTS = 3
+    ERROR_UPLOAD_FAILED = 4
 
 ################################################################################
 # Functions

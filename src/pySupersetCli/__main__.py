@@ -40,6 +40,7 @@ import logging
 from pySupersetCli.version import __version__, __author__, __email__, __repository__, __license__
 from pySupersetCli.ret import Ret
 from pySupersetCli.superset import Superset
+from pySupersetCli.cmd_upload import register as cmd_upload_register
 
 
 ################################################################################
@@ -48,7 +49,7 @@ from pySupersetCli.superset import Superset
 
 # Register a command here!
 _COMMAND_REG_LIST = [
-
+    cmd_upload_register
 ]
 
 PROG_NAME = "pySupersetCli"
