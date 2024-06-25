@@ -120,8 +120,8 @@ def _execute(args, superset_client: Superset) -> Ret:
     if ("" != args.table) and ("" != args.file) and (None is not superset_client):
         try:
             with open(args.file, mode="r", encoding="UTF-8") as json_file:
-                # Input is a dictionary, with keys as index
-                data_frame = pd.read_json(json_file, orient='index')
+                # Input is a list of dictionaries.
+                data_frame = pd.read_json(json_file, orient='records')
 
             # pylint: disable=no-member
             data_frame.to_csv(_TEMP_FILE_NAME, encoding="UTF-8", index=False)
