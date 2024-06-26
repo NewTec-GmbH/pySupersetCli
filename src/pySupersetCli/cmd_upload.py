@@ -47,6 +47,7 @@ from pySupersetCli.superset import Superset
 LOG: logging.Logger = logging.getLogger(__name__)
 _CMD_NAME = "upload"
 _TEMP_FILE_NAME = "./temp.csv"
+DATE_COLUMN = "date"
 
 ################################################################################
 # Classes
@@ -119,9 +120,17 @@ def _execute(args, superset_client: Superset) -> Ret:
 
     if ("" != args.table) and ("" != args.file) and (None is not superset_client):
         try:
-            with open(args.file, mode="r", encoding="UTF-8") as json_file:
+            if args.file.endswith(".json") is False:
+                raise ValueError(
+                    "Invalid file format. Please provide a JSON file.")
+
+            with open(args.file, encoding="utf-8") as json_file:
                 # Input is a dictionary, with keys as index
                 data_frame = pd.read_json(json_file, orient='index')
+
+                if DATE_COLUMN not in data_frame:
+                    raise ValueError(
+                        "No 'date' column found in the JSON file.")
 
             # pylint: disable=no-member
             data_frame.to_csv(_TEMP_FILE_NAME, encoding="UTF-8", index=False)
@@ -129,6 +138,7 @@ def _execute(args, superset_client: Superset) -> Ret:
             with open(_TEMP_FILE_NAME, 'rb') as csv_file:
                 upload_file = {'file': csv_file}
                 upload_body = {'already_exists': 'append',
+                               'column_dates': [DATE_COLUMN],
                                'table_name': args.table}
 
                 # Upload the CSV file to the specified table
@@ -149,7 +159,7 @@ def _execute(args, superset_client: Superset) -> Ret:
                 os.remove(_TEMP_FILE_NAME)
 
         except Exception as e:  # pylint: disable=broad-except
-            LOG.error("%s", e)
+            LOG.error("Exception: %s", e)
             return_status = Ret.ERROR_INVALID_ARGUMENTS
 
     return return_status
