@@ -127,12 +127,17 @@ def _execute(args, superset_client: Superset) -> Ret:
                 # Input is a dictionary, with keys as index
                 data_frame = pd.read_json(json_file, orient='index')
 
+                if "date" not in data_frame:
+                    raise ValueError(
+                        "No 'date' column found in the JSON file.")
+
             # pylint: disable=no-member
             data_frame.to_csv(_TEMP_FILE_NAME, encoding="UTF-8", index=False)
 
             with open(_TEMP_FILE_NAME, 'rb') as csv_file:
                 upload_file = {'file': csv_file}
                 upload_body = {'already_exists': 'append',
+                               'column_dates': ["date"],
                                'table_name': args.table}
 
                 # Upload the CSV file to the specified table
