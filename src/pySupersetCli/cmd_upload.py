@@ -47,6 +47,7 @@ from pySupersetCli.superset import Superset
 LOG: logging.Logger = logging.getLogger(__name__)
 _CMD_NAME = "upload"
 _TEMP_FILE_NAME = "./temp.csv"
+DATE_COLUMN = "date"
 
 ################################################################################
 # Classes
@@ -127,7 +128,7 @@ def _execute(args, superset_client: Superset) -> Ret:
                 # Input is a dictionary, with keys as index
                 data_frame = pd.read_json(json_file, orient='index')
 
-                if "date" not in data_frame:
+                if DATE_COLUMN not in data_frame:
                     raise ValueError(
                         "No 'date' column found in the JSON file.")
 
@@ -137,7 +138,7 @@ def _execute(args, superset_client: Superset) -> Ret:
             with open(_TEMP_FILE_NAME, 'rb') as csv_file:
                 upload_file = {'file': csv_file}
                 upload_body = {'already_exists': 'append',
-                               'column_dates': ["date"],
+                               'column_dates': [DATE_COLUMN],
                                'table_name': args.table}
 
                 # Upload the CSV file to the specified table
