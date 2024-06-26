@@ -119,7 +119,11 @@ def _execute(args, superset_client: Superset) -> Ret:
 
     if ("" != args.table) and ("" != args.file) and (None is not superset_client):
         try:
-            with open(args.file, mode="r", encoding="UTF-8") as json_file:
+            if args.file.endswith(".json") is False:
+                raise ValueError(
+                    "Invalid file format. Please provide a JSON file.")
+
+            with open(args.file, encoding="utf-8") as json_file:
                 # Input is a dictionary, with keys as index
                 data_frame = pd.read_json(json_file, orient='index')
 
@@ -149,7 +153,7 @@ def _execute(args, superset_client: Superset) -> Ret:
                 os.remove(_TEMP_FILE_NAME)
 
         except Exception as e:  # pylint: disable=broad-except
-            LOG.error("%s", e)
+            LOG.error("Exception: %s", e)
             return_status = Ret.ERROR_INVALID_ARGUMENTS
 
     return return_status
