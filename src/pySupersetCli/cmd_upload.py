@@ -36,6 +36,7 @@
 import os
 import argparse
 import logging
+import json
 import pandas as pd
 from pySupersetCli.ret import Ret
 from pySupersetCli.superset import Superset
@@ -125,14 +126,16 @@ def _execute(args, superset_client: Superset) -> Ret:
                     "Invalid file format. Please provide a JSON file.")
 
             with open(args.file, encoding="utf-8") as json_file:
-                # Input is a dictionary, with keys as index
-                data_frame = pd.read_json(json_file, orient='index')
+                data_dict = json.load(json_file)
 
-                if DATE_COLUMN not in data_frame:
+                if DATE_COLUMN not in data_dict:
                     raise ValueError(
                         "No 'date' column found in the JSON file.")
 
-            # pylint: disable=no-member
+            # Pack the JSON data into a Pandas DataFrame.
+            data_frame = pd.DataFrame([data_dict])
+
+            # Write the DataFrame to a temporary CSV file.
             data_frame.to_csv(_TEMP_FILE_NAME, encoding="UTF-8", index=False)
 
             with open(_TEMP_FILE_NAME, 'rb') as csv_file:
