@@ -1,0 +1,20 @@
+@startuml ArchitectureDiagram
+
+package "pySupersetCli" as pySupersetCli {
+    component "Main Entry Point" as main
+    component "superset"as server
+    component "Commands" <<command>> as cmd
+}
+
+package "Python" as python {
+    component "Argparse" as argparse
+    component "Requests" as requests
+}
+
+main *--> server
+main o--> cmd : 0..*
+main *--> argparse
+
+server *--> requests
+
+@enduml

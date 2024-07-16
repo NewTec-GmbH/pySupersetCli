@@ -1,0 +1,33 @@
+@startuml DeploymentDiagram
+
+node "Apache Superset"<<virtual-machine>> as superset
+
+database "DB Server" {
+    component "Database" as supersetDb
+
+    note bottom of supersetDb
+        The database is project specific, means
+        one database per project.
+    end note
+}
+
+interface "REST API" as supersetRestApi
+
+superset --- supersetRestApi
+superset -- supersetDb
+
+node "Continuous Integration Server"<<virtual-machine>> {
+
+    package "scripts" {
+        component "pySupersetCli" as pySupersetCli
+    }
+}
+
+supersetRestApi )-- pySupersetCli
+
+note top of superset
+    Report frontend for project metrics.
+end note
+
+
+@enduml
