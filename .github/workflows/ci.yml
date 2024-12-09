@@ -5,7 +5,7 @@ on:
   push:
     branches: ["**"]
   pull_request:
-    branches: [main]py
+    branches: [main]
   release:
     # A release, pre-release, or draft of a release is published.
     types: [published]
